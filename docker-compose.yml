@@ -20,6 +20,7 @@ services:
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    restart: unless-stopped
   mysql:
     container_name: mysql
     environment:
@@ -34,6 +35,7 @@ services:
         limits:
           cpus: "1.0"
           memory: "2g"
+    restart: unless-stopped
   redis:
     container_name: redis
     ports:
@@ -44,3 +46,4 @@ services:
       - ./redislog:/var/log/redis
     image: redis:8.0-M03-alpine3.21
     command: redis-server --save 60 1 --loglevel debug --appendonly yes --dir /data/aof --appendfilename appendonly.aof --dbfilename dump.rdb --logfile /var/log/redis/redis.log
+    restart: unless-stopped
