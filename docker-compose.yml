@@ -1,0 +1,46 @@
+name: storage
+services:
+  elasticsearch:
+    container_name: es
+    image: elasticsearch:8.17.1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "2g"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./esdata:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+  mysql:
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=163453
+    ports:
+      - 3306:3306
+    image: mysql:9.2.0
+    volumes:
+      - ./mysql:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "2g"
+  redis:
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redisdata/rdb:/data/rdb
+      - ./redisdata/aof:/data/aof
+      - ./redislog:/var/log/redis
+    image: redis:8.0-M03-alpine3.21
+    command: redis-server --save 60 1 --loglevel debug --appendonly yes --dir /data/aof --appendfilename appendonly.aof --dbfilename dump.rdb --logfile /var/log/redis/redis.log
