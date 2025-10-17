@@ -5,3 +5,4 @@ esdata/*
 mysql/*
 redisdata/*
 redislog/*
+*.db
