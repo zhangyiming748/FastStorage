@@ -3,9 +3,8 @@ package storage
 import (
 	"log"
 	"os"
-	"path/filepath"
 
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -13,22 +12,22 @@ var gormDB *gorm.DB
 
 func SetSqlite() *gorm.DB {
 	// 创建数据目录
-	dbPath := filepath.Join(".", "data", "faststorage.db")
-	dir := filepath.Dir(dbPath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		log.Fatal("Failed to create data directory:", err)
-	}
-
-	// 连接到 SQLite 数据库，如果文件不存在则会自动创建
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+	err := os.MkdirAll("./data", 0755)
 	if err != nil {
-		log.Fatal("Failed to connect to SQLite database:", err)
+		log.Fatal("无法创建数据目录:", err)
 	}
 
-	log.Println("Successfully connected to SQLite database with GORM.")
+	// 使用纯Go SQLite驱动连接数据库
+	db, err := gorm.Open(sqlite.Open("./data/faststorage.db"), &gorm.Config{})
+	if err != nil {
+		log.Fatal("无法连接到数据库:", err)
+	}
 	gormDB = db
-	return db
+
+	log.Println("成功连接到SQLite数据库")
+	return gormDB
 }
+
 
 func GetSqlite() *gorm.DB {
 	return gormDB
