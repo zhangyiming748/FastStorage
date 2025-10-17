@@ -28,7 +28,6 @@ func SetSqlite() *gorm.DB {
 	return gormDB
 }
 
-
 func GetSqlite() *gorm.DB {
 	return gormDB
 }
