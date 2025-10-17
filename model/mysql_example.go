@@ -15,7 +15,7 @@ type M_Example struct {
 	DeletedAt time.Time `xorm:"deleted"`
 }
 
-func (e M_Example) Sync() {
+func (m *M_Example) Sync() {
 	log.Printf("开始同步表结构")
 	if err := storage.GetMysql().Sync2(M_Example{}); err != nil {
 		log.Printf("同步表结构失败: %v", err)

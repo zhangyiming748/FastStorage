@@ -27,32 +27,32 @@ func (e S_Example) Sync() {
 }
 
 // Create 创建一个新的 Example 记录
-func (e Example) Create() error {
-	result := storage.GetSqlite().Create(&e)
+func (s S_Example) Create() error {
+	result := storage.GetSqlite().Create(&s)
 	return result.Error
 }
 
 // GetByID 根据 ID 获取 Example 记录
-func (e *Example) GetByID(id int64) error {
-	result := storage.GetSqlite().First(&e, id)
+func (s *S_Example) GetByID(id int64) error {
+	result := storage.GetSqlite().First(&s, id)
 	return result.Error
 }
 
 // Update 更新 Example 记录
-func (e Example) Update() error {
-	result := storage.GetSqlite().Save(&e)
+func (s *S_Example) Update() error {
+	result := storage.GetSqlite().Save(&s)
 	return result.Error
 }
 
 // Delete 删除 Example 记录
-func (e Example) Delete() error {
-	result := storage.GetSqlite().Delete(&e)
+func (s *S_Example) Delete() error {
+	result := storage.GetSqlite().Delete(&s)
 	return result.Error
 }
 
 // GetAll 获取所有 Example 记录
-func (e Example) GetAll() ([]Example, error) {
-	var examples []Example
+func (s *S_Example) GetAll() ([]S_Example, error) {
+	var examples []S_Example
 	result := storage.GetSqlite().Find(&examples)
 	return examples, result.Error
 }
