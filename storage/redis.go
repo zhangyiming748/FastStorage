@@ -9,6 +9,9 @@ import (
 
 var redisClient *redis.Client
 
+/*
+这个函数创建一个在程序运行后一直保持链接的 Redis 客户端实例
+*/
 func SetRedis(host, port, password string) {
 	// 创建 Redis 客户端
 	rdb := redis.NewClient(&redis.Options{
@@ -28,7 +31,9 @@ func SetRedis(host, port, password string) {
 	redisClient = rdb
 }
 
+/*
+提供一个全局访问的接口 GetRedis() 供其他包使用 让需要访问redis的时候直接拿到实例
+*/
 func GetRedis() *redis.Client {
 	return redisClient
 }
-

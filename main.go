@@ -12,7 +12,7 @@ func main() {
 	storage.SetSqlite()
 
 	// 同步表结构
-	t := new(model.Example)
+	t := new(model.S_Example)
 	t.Sync()
 
 	// 测试 CRUD 操作
@@ -21,7 +21,7 @@ func main() {
 
 func testCRUD() {
 	// 创建测试数据
-	example := model.Example{
+	example := model.S_Example{
 		Content: "这是一个测试内容",
 	}
 
@@ -33,7 +33,7 @@ func testCRUD() {
 	}
 
 	// 查询记录
-	var retrieved model.Example
+	var retrieved model.S_Example
 	if err := retrieved.GetByID(example.Id); err != nil {
 		log.Printf("查询记录失败: %v", err)
 	} else {

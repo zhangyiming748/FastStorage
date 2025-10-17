@@ -2,30 +2,11 @@ package model
 
 import (
 	"context"
-	"log"
+	"encoding/json"
 	"time"
 
 	"github.com/zhangyiming748/FastStorage/storage"
-	"gorm.io/gorm"
 )
-
-type R_Example struct {
-	Id        int64          `gorm:"primaryKey;autoIncrement;comment:主键id"`
-	Content   string         `gorm:"size:512;comment:内容"`
-	CreatedAt time.Time      // GORM 会自动管理这些时间字段
-	UpdatedAt time.Time      // GORM 会自动管理这些时间字段
-	DeletedAt gorm.DeletedAt `gorm:"index"` // 软删除支持
-}
-
-func (r *R_Example) Sync() {
-	log.Printf("开始同步表结构")
-	
-	// 使用 GORM 自动迁移功能创建表
-	if err := storage.GetSqlite().AutoMigrate(&R_Example{}); err != nil {
-		log.Printf("同步表结构失败: %v", err)
-	}
-	log.Printf("同步表结构完成")
-}
 
 // Redis 相关操作示例
 
@@ -44,7 +25,7 @@ func SetWithTimeout(key string, value interface{}, timeout time.Duration) error 
 	// 创建一个具有超时控制的 context
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel() // 确保在函数结束时释放资源
-	
+
 	return storage.GetRedis().Set(ctx, key, value, 0).Err()
 }
 
@@ -67,7 +48,7 @@ func GetWithTimeout(key string, timeout time.Duration) (string, error) {
 	// 创建一个具有超时控制的 context
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel() // 确保在函数结束时释放资源
-	
+
 	return storage.GetRedis().Get(ctx, key).Result()
 }
 
@@ -85,4 +66,45 @@ func Exists(key string) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+/*这里的key为string,filed和value为json(golang中表现为结构体形式)中的每一组key和value
+比如
+```json
+{
+  "name":"zhangsan",
+  "age":18
+}```
+其中json手动设定一个key
+第一组filed为name,value为zhangsan
+第二组filed为age,value为18
+*/
+// HSet 将结构体数据存储到Redis哈希表中
+func HSet(key string, value interface{}) error {
+	// 将结构体序列化为JSON，然后解析为map[string]interface{}
+	data, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	var fields map[string]interface{}
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+
+	// 使用HSet将所有字段存储到Redis哈希表中
+	ctx := context.Background()
+	return storage.GetRedis().HSet(ctx, key, fields).Err()
+}
+
+// HGet 获取哈希表中指定字段的值
+func HGet(key, field string) (string, error) {
+	ctx := context.Background()
+	return storage.GetRedis().HGet(ctx, key, field).Result()
+}
+
+// HGetAll 获取哈希表中所有的字段和值
+func HGetAll(key string) (map[string]string, error) {
+	ctx := context.Background()
+	return storage.GetRedis().HGetAll(ctx, key).Result()
 }
